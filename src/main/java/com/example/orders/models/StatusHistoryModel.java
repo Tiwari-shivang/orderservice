@@ -24,7 +24,7 @@ public class StatusHistoryModel {
     private UUID id;
     private String previous_status, new_status, changed_by;
     private Timestamp timestamp;
-    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    @JoinColumn(name = "order_id", referencedColumnName = "id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private OrdersModel order;
 }

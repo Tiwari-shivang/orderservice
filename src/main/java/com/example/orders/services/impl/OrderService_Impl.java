@@ -6,19 +6,24 @@ import com.example.orders.dto.OrderReqDTO;
 import com.example.orders.dto.OrderResponseDTO;
 import com.example.orders.models.OrderItemModel;
 import com.example.orders.models.OrdersModel;
+import com.example.orders.models.StatusHistoryModel;
 import com.example.orders.repositories.OrderRepository;
+import com.example.orders.repositories.StatusRepository;
 import com.example.orders.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderService_Impl implements OrderService {
     @Autowired
     private OrderRepository repo;
+
+    @Autowired
+    private StatusRepository statusRepo;
 
     @Override
     public OrderResponseDTO addOrder(OrderReqDTO orderReqDto){
@@ -36,7 +41,15 @@ public class OrderService_Impl implements OrderService {
         });
         newOrder.setOrderItems(orders);
         OrdersModel createdOrder = repo.save(newOrder);
-        // ab entity model ko response dto me convert krunga.
+
+        StatusHistoryModel history = new StatusHistoryModel();
+        history.setOrder(createdOrder);
+        history.setPrevious_status("N/A");
+        history.setNew_status("PENDING");
+        history.setChanged_by("User");
+        history.setTimestamp(Timestamp.from(Instant.now()));
+        statusRepo.save(history);
+
         ArrayList<OrderItemDTO> createItems = new ArrayList<>();
         createdOrder.getOrderItems().forEach(itemModel -> {
             OrderItemDTO itemDTO = new OrderItemDTO();
