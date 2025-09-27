@@ -6,7 +6,6 @@ import com.example.orders.dto.OrderReqDTO;
 import com.example.orders.dto.OrderResponseDTO;
 import com.example.orders.models.OrderItemModel;
 import com.example.orders.models.OrdersModel;
-import com.example.orders.repositories.OrderItemRepository;
 import com.example.orders.repositories.OrderRepository;
 import com.example.orders.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +20,10 @@ public class OrderService_Impl implements OrderService {
     @Autowired
     private OrderRepository repo;
 
-    @Autowired
-    private OrderItemRepository itemRepo;
-
     @Override
     public OrderResponseDTO addOrder(OrderReqDTO orderReqDto){
         OrdersModel newOrder = new OrdersModel(orderReqDto);
-        OrdersModel createdOrder = repo.save(newOrder);
-
-        ArrayList<OrderItemDTO> addedItems = new ArrayList<>();
+        ArrayList<OrderItemModel> orders = new ArrayList<>();
         orderReqDto.getItems().forEach(itemDto -> {
             OrderItemModel itemModel = new OrderItemModel();
             itemModel.setMenuItemId(itemDto.getMenuItemId());
@@ -37,12 +31,24 @@ public class OrderService_Impl implements OrderService {
             itemModel.setMenuItemPrice(itemDto.getMenuItemPrice());
             itemModel.setQuantity(itemDto.getQuantity());
             itemModel.setTotalPrice(itemDto.getTotalPrice());
-            itemModel.setOrder(createdOrder);
-            OrderItemModel addedItem = itemRepo.save(itemModel);
-            OrderItemDTO addedItemDTO = new OrderItemDTO(addedItem.getId().toString(), addedItem.getMenuItemId(), addedItem.getMenuItemName(), addedItem.getMenuItemPrice(), addedItem.getQuantity(), addedItem.getTotalPrice());
-            addedItems.add(addedItemDTO);
+            itemModel.setOrder(newOrder);
+            orders.add(itemModel);
         });
-        return new OrderResponseDTO(createdOrder.getId().toString(), createdOrder.getUser_id().toString(), createdOrder.getRestaurant_address_id().toString(), createdOrder.getCart_id().toString(), null, null, createdOrder.getOrder_status(), createdOrder.getPayment_status(), createdOrder.getSpecial_instructions(), createdOrder.getTotal_amount(), addedItems, createdOrder.getCreated_at(), createdOrder.getUpdated_at());
+        newOrder.setOrderItems(orders);
+        OrdersModel createdOrder = repo.save(newOrder);
+        // ab entity model ko response dto me convert krunga.
+        ArrayList<OrderItemDTO> createItems = new ArrayList<>();
+        createdOrder.getOrderItems().forEach(itemModel -> {
+            OrderItemDTO itemDTO = new OrderItemDTO();
+            itemDTO.setId(itemModel.getId().toString());
+            itemDTO.setMenuItemId(itemModel.getMenuItemId());
+            itemDTO.setMenuItemName(itemModel.getMenuItemName());
+            itemDTO.setMenuItemPrice(itemModel.getMenuItemPrice());
+            itemDTO.setQuantity(itemModel.getQuantity());
+            itemDTO.setTotalPrice(itemModel.getTotalPrice());
+            createItems.add(itemDTO);
+        });
+        return new OrderResponseDTO(createdOrder.getId().toString(), createdOrder.getUser_id().toString(), createdOrder.getRestaurant_address_id().toString(), createdOrder.getCart_id().toString(), null, null, createdOrder.getOrder_status(), createdOrder.getPayment_status(), createdOrder.getSpecial_instructions(), createdOrder.getTotal_amount(), createItems, createdOrder.getCreated_at(), createdOrder.getUpdated_at());
     }
 
 //    @Override

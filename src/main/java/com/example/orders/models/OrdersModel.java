@@ -32,6 +32,9 @@ public class OrdersModel {
     private Double total_amount;
     private Timestamp created_at, updated_at;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItemModel> orderItems = new ArrayList<>();
+
     public OrdersModel(OrderReqDTO order){
         this.user_id = UUID.fromString(order.getUser_id());
         this.restaurant_address_id = UUID.fromString(order.getRestaurant_address_id());
