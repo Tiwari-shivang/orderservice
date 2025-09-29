@@ -18,9 +18,9 @@ public class OrderController {
         return ResponseEntity.ok(addedOrder);
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<?> getOrderDetails(@PathVariable("id") String id){
-//        OrderResponseDTO response = service.getOrderDetails(id);
-//        return ResponseEntity.ok(response);
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOrderDetails(@PathVariable("id") String id){
+        OrderResponseDTO response = service.getOrderDetails(id);
+        return ResponseEntity.ok(response);
+    }
 }

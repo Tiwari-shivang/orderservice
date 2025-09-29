@@ -6,5 +6,5 @@ import com.example.orders.models.OrdersModel;
 
 public interface OrderService {
     OrderResponseDTO addOrder(OrderReqDTO order);
-//    OrderResponseDTO getOrderDetails(String id);
+    OrderResponseDTO getOrderDetails(String id);
 }

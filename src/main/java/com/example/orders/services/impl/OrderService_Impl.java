@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.UUID;
 
 @Service
 public class OrderService_Impl implements OrderService {
@@ -64,10 +65,25 @@ public class OrderService_Impl implements OrderService {
         return new OrderResponseDTO(createdOrder.getId().toString(), createdOrder.getUser_id().toString(), createdOrder.getRestaurant_address_id().toString(), createdOrder.getCart_id().toString(), null, null, createdOrder.getOrder_status(), createdOrder.getPayment_status(), createdOrder.getSpecial_instructions(), createdOrder.getTotal_amount(), createItems, createdOrder.getCreated_at(), createdOrder.getUpdated_at());
     }
 
-//    @Override
-//    public OrderResponseDTO getOrderDetails(String id){
-//        OrdersModel order = repo.findById(UUID.fromString(id)).orElseThrow(() -> new RuntimeException("Not found"));
-//        ArrayList<OrderItemDTO> items = order.getOrderItems().stream().map(item -> new OrderItemDTO(item.getId().toString(), item.getMenuItemId(), item.getMenuItemName(), item.getMenuItemPrice(), item.getQuantity(), item.getTotalPrice())).collect(Collectors.toCollection(ArrayList::new));
-//        return new OrderResponseDTO(order.getId().toString(), order.getUser_id().toString(), order.getRestaurant_address_id().toString(), order.getCart_id().toString(), order.getDelivery_id().toString(), order.getPayment_id().toString(), order.getOrder_status(), order.getPayment_status(), order.getSpecial_instructions(), order.getTotal_amount(), items, order.getCreated_at(), order.getUpdated_at());
-//    }
+    @Override
+    public OrderResponseDTO getOrderDetails(String id){
+        OrdersModel order = repo.findById(UUID.fromString(id)).orElseThrow(() -> new RuntimeException("Not found"));
+        ArrayList<OrderItemDTO> orderItems = new ArrayList<>();
+        order.getOrderItems().forEach(item -> {
+            orderItems.add(new OrderItemDTO(item.getId().toString(), item.getMenuItemId(), item.getMenuItemName(), item.getMenuItemName(), item.getQuantity(), item.getTotalPrice()));
+        });
+        OrderResponseDTO response = new OrderResponseDTO();
+        response.setId(order.getId().toString());
+        response.setUser_id(order.getUser_id().toString());
+        response.setRestaurant_address_id(order.getRestaurant_address_id().toString());
+        response.setCart_id(order.getCart_id().toString());
+        response.setOrder_status(order.getOrder_status());
+        response.setPayment_status(order.getPayment_status());
+        response.setSpecial_instructions(order.getSpecial_instructions());
+        response.setTotal_amount(order.getTotal_amount());
+        response.setItems(orderItems);
+        response.setCreated_at(order.getCreated_at());
+        response.setUpdated_at(order.getUpdated_at());
+        return response;
+    }
 }
