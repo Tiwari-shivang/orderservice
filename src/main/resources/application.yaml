@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: orders
+  datasource:
+    url: jdbc:mysql://localhost:3306/eatzy_order
+    username: root
+    password:
